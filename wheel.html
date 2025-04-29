@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>彩色轉盤抽選</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #fefaf4;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      text-align: center;
+      padding: 20px;
+      color: #333;
+    }
+
+    h1 {
+      font-size: 36px;
+      color: #e74c3c;
+    }
+
+    textarea {
+      width: 60%;
+      height: 80px;
+      font-size: 16pt;
+      padding: 10px;
+      border: 2px dashed #3498db;
+      border-radius: 8px;
+      resize: vertical;
+    }
+
+    button {
+      margin: 10px;
+      padding: 12px 24px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      background-color: #f39c12;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #d35400;
+    }
+
+    #wheel {
+      margin: 40px auto;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      border: 10px solid #f8c471;
+      position: relative;
+      overflow: hidden;
+      background: conic-gradient(
+        #ff9ff3 0deg 60deg,
+        #feca57 60deg 120deg,
+        #1dd1a1 120deg 180deg,
+        #54a0ff 180deg 240deg,
+        #ff6b6b 240deg 300deg,
+        #48dbfb 300deg 360deg
+      );
+    }
+
+    #wheel::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 40px;
+      height: 40px;
+      background: #fff;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+    }
+
+    .pointer {
+      width: 0;
+      height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-bottom: 30px solid red;
+      margin: 0 auto;
+    }
+
+    #resultBox {
+      margin-top: 30px;
+      font-size: 45pt;
+      line-height: 0.7;
+      display: none;
+      animation: popResult 0.6s ease-out forwards;
+    }
+
+    @keyframes popResult {
+      0% { transform: scale(0.2); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .confetti {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      background-image: url('confetti.gif'); /* 建議素材名：confetti.gif，訴求：營造中獎的繽紛儀式感 */
+      background-size: cover;
+      z-index: 1000;
+      animation: fadeOut 2s ease-out forwards;
+    }
+
+    @keyframes fadeOut {
+      0% { opacity: 1; }
+      100% { opacity: 0; display: none; }
+    }
+  </style>
+</head>
+<body>
+  <h1>🎡 彩色轉盤抽選</h1>
+  <p>請輸入選項（用 , 或換行分隔）：</p>
+  <textarea id="optionsInput" placeholder="例如：蘋果, 香蕉, 西瓜"></textarea><br />
+  <button onclick="spinWheel()">開始</button>
+  <button onclick="clearAll()">全部清除</button>
+
+  <div class="pointer"></div>
+  <div id="wheel"></div>
+  <div id="resultBox"></div>
+
+  <script>
+    let currentOptions = [];
+
+    function spinWheel() {
+      const input = document.getElementById('optionsInput').value;
+      currentOptions = input.split(/,|\n/).map(s => s.trim()).filter(s => s);
+      if (currentOptions.length < 2) {
+        alert('請至少輸入兩個選項');
+        return;
+      }
+
+      const resultBox = document.getElementById('resultBox');
+      resultBox.style.display = 'none';
+
+      const wheel = document.getElementById('wheel');
+      const deg = 3600 + Math.floor(Math.random() * 360);
+      wheel.style.transition = 'transform 10s ease-in-out';
+      wheel.style.transform = `rotate(${deg}deg)`;
+
+      setTimeout(() => {
+        const selected = currentOptions[Math.floor(Math.random() * currentOptions.length)];
+        resultBox.innerHTML = `💥 ${selected} 💥`;
+        resultBox.style.display = 'block';
+
+        const confetti = document.createElement('div');
+        confetti.classList.add('confetti');
+        document.body.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 2500);
+
+        const sound = new Audio('success.mp3'); // 建議素材名：success.mp3，訴求：抽籤成功時的音效提示
+        sound.play();
+      }, 10000);
+    }
+
+    function clearAll() {
+      document.getElementById('optionsInput').value = '';
+      document.getElementById('resultBox').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
