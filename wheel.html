@@ -3,97 +3,69 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>彩色轉盤抽選</title>
+  <title>🎡 彩色轉盤</title>
+  <link rel="stylesheet" href="../style.css" />
   <style>
     body {
       margin: 0;
-      background-color: #fefaf4;
-      font-family: 'Comic Sans MS', cursive, sans-serif;
-      text-align: center;
-      padding: 20px;
+      padding: 0;
+      background-color: #fff8ec;
+      font-family: 'Comic Sans MS', 'Arial', sans-serif;
       color: #333;
+      overflow-x: hidden;
     }
 
-    h1 {
-      font-size: 36px;
-      color: #e74c3c;
+    .container {
+      text-align: center;
+      padding: 40px 20px;
     }
 
     textarea {
-      width: 60%;
-      height: 80px;
+      width: 90%;
+      min-height: 80px;
       font-size: 16pt;
       padding: 10px;
-      border: 2px dashed #3498db;
       border-radius: 8px;
+      border: 2px solid #ccc;
       resize: vertical;
+    }
+
+    .controls {
+      margin-top: 20px;
     }
 
     button {
       margin: 10px;
-      padding: 12px 24px;
+      padding: 10px 20px;
       font-size: 18px;
+      background-color: #f39c12;
+      color: white;
       border: none;
       border-radius: 10px;
-      background-color: #f39c12;
-      color: #fff;
       cursor: pointer;
-      transition: background-color 0.3s ease;
     }
 
     button:hover {
-      background-color: #d35400;
+      background-color: #e67e22;
     }
 
-    #wheel {
-      margin: 40px auto;
-      width: 300px;
-      height: 300px;
-      border-radius: 50%;
-      border: 10px solid #f8c471;
-      position: relative;
-      overflow: hidden;
-      background: conic-gradient(
-        #ff9ff3 0deg 60deg,
-        #feca57 60deg 120deg,
-        #1dd1a1 120deg 180deg,
-        #54a0ff 180deg 240deg,
-        #ff6b6b 240deg 300deg,
-        #48dbfb 300deg 360deg
-      );
-    }
-
-    #wheel::before {
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 40px;
-      height: 40px;
-      background: #fff;
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 2;
-    }
-
-    .pointer {
-      width: 0;
-      height: 0;
-      border-left: 15px solid transparent;
-      border-right: 15px solid transparent;
-      border-bottom: 30px solid red;
-      margin: 0 auto;
-    }
-
-    #resultBox {
+    canvas {
       margin-top: 30px;
-      font-size: 45pt;
-      line-height: 0.7;
-      display: none;
-      animation: popResult 0.6s ease-out forwards;
+      max-width: 100%;
     }
 
-    @keyframes popResult {
+    #result {
+      font-size: 45pt;
+      margin-top: 30px;
+      animation: pop 0.6s ease-out;
+      background-color: #fffbcc;
+      display: inline-block;
+      padding: 20px;
+      border-radius: 30px;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
+    }
+
+    @keyframes pop {
       0% { transform: scale(0.2); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
     }
@@ -104,66 +76,119 @@
       width: 100%;
       height: 100%;
       pointer-events: none;
-      background-image: url('confetti.gif'); /* 建議素材名：confetti.gif，訴求：營造中獎的繽紛儀式感 */
-      background-size: cover;
-      z-index: 1000;
-      animation: fadeOut 2s ease-out forwards;
-    }
-
-    @keyframes fadeOut {
-      0% { opacity: 1; }
-      100% { opacity: 0; display: none; }
+      z-index: 9999;
     }
   </style>
 </head>
 <body>
-  <h1>🎡 彩色轉盤抽選</h1>
-  <p>請輸入選項（用 , 或換行分隔）：</p>
-  <textarea id="optionsInput" placeholder="例如：蘋果, 香蕉, 西瓜"></textarea><br />
-  <button onclick="spinWheel()">開始</button>
-  <button onclick="clearAll()">全部清除</button>
-
-  <div class="pointer"></div>
-  <div id="wheel"></div>
-  <div id="resultBox"></div>
+  <div class="container">
+    <h1>🎡 彩色轉盤</h1>
+    <textarea id="input" placeholder="請輸入選項，每個選項用逗號或換行分隔"></textarea>
+    <div class="controls">
+      <button onclick="spinWheel()">開始</button>
+      <button onclick="resetWheel()">再一次</button>
+      <button onclick="clearInput()">全部清除</button>
+    </div>
+    <canvas id="wheelCanvas" width="400" height="400"></canvas>
+    <div id="result"></div>
+  </div>
+  <canvas class="confetti" id="confetti"></canvas>
 
   <script>
-    let currentOptions = [];
+    const canvas = document.getElementById('wheelCanvas');
+    const ctx = canvas.getContext('2d');
+    const resultDiv = document.getElementById('result');
+    const confettiCanvas = document.getElementById('confetti');
+    const confettiCtx = confettiCanvas.getContext('2d');
+    let options = [];
+    let angle = 0;
+    let spinning = false;
 
-    function spinWheel() {
-      const input = document.getElementById('optionsInput').value;
-      currentOptions = input.split(/,|\n/).map(s => s.trim()).filter(s => s);
-      if (currentOptions.length < 2) {
-        alert('請至少輸入兩個選項');
-        return;
-      }
-
-      const resultBox = document.getElementById('resultBox');
-      resultBox.style.display = 'none';
-
-      const wheel = document.getElementById('wheel');
-      const deg = 3600 + Math.floor(Math.random() * 360);
-      wheel.style.transition = 'transform 10s ease-in-out';
-      wheel.style.transform = `rotate(${deg}deg)`;
-
-      setTimeout(() => {
-        const selected = currentOptions[Math.floor(Math.random() * currentOptions.length)];
-        resultBox.innerHTML = `💥 ${selected} 💥`;
-        resultBox.style.display = 'block';
-
-        const confetti = document.createElement('div');
-        confetti.classList.add('confetti');
-        document.body.appendChild(confetti);
-        setTimeout(() => confetti.remove(), 2500);
-
-        const sound = new Audio('success.mp3'); // 建議素材名：success.mp3，訴求：抽籤成功時的音效提示
-        sound.play();
-      }, 10000);
+    function parseInput() {
+      const input = document.getElementById('input').value;
+      const raw = input.split(/,|\n/).map(s => s.trim()).filter(s => s);
+      options = raw.map((_, i) => (i + 1).toString());
     }
 
-    function clearAll() {
-      document.getElementById('optionsInput').value = '';
-      document.getElementById('resultBox').style.display = 'none';
+    function drawWheel() {
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = 180;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const angleStep = 2 * Math.PI / options.length;
+      for (let i = 0; i < options.length; i++) {
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.fillStyle = `hsl(${i * (360 / options.length)}, 90%, 70%)`;
+        ctx.arc(centerX, centerY, radius, angleStep * i + angle, angleStep * (i + 1) + angle);
+        ctx.fill();
+        ctx.closePath();
+      }
+    }
+
+    function spinWheel() {
+      if (spinning) return;
+      parseInput();
+      if (options.length === 0) return;
+      spinning = true;
+      let spinTime = 0;
+      const totalSpinTime = 10000; // 10 秒
+      const spin = () => {
+        spinTime += 30;
+        angle += (Math.PI / 20) * Math.sin(Math.PI * spinTime / totalSpinTime);
+        drawWheel();
+        if (spinTime < totalSpinTime) {
+          setTimeout(spin, 30);
+        } else {
+          spinning = false;
+          const selected = Math.floor(options.length * ((angle / (2 * Math.PI)) % 1));
+          showResult(selected);
+        }
+      };
+      playSound('spin');
+      spin();
+    }
+
+    function showResult(index) {
+      const input = document.getElementById('input').value;
+      const raw = input.split(/,|\n/).map(s => s.trim()).filter(s => s);
+      resultDiv.innerHTML = `<span style="font-family:Impact,Comic Sans MS;">💥 ${raw[index]}</span>`;
+      launchConfetti();
+      playSound('ding');
+    }
+
+    function resetWheel() {
+      parseInput();
+      resultDiv.textContent = '';
+      angle = 0;
+      drawWheel();
+    }
+
+    function clearInput() {
+      document.getElementById('input').value = '';
+      resultDiv.textContent = '';
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function playSound(type) {
+      const audio = new Audio(type === 'spin' ? '../sounds/spin.mp3' : '../sounds/ding.mp3');
+      audio.play();
+    }
+
+    function launchConfetti() {
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
+      for (let i = 0; i < 100; i++) {
+        const x = Math.random() * confettiCanvas.width;
+        const y = Math.random() * confettiCanvas.height;
+        const size = Math.random() * 8 + 4;
+        const color = `hsl(${Math.random() * 360}, 100%, 70%)`;
+        confettiCtx.fillStyle = color;
+        confettiCtx.beginPath();
+        confettiCtx.arc(x, y, size, 0, 2 * Math.PI);
+        confettiCtx.fill();
+      }
+      setTimeout(() => confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height), 2000);
     }
   </script>
 </body>
