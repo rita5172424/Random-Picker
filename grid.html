@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🌲 九宮格抽選</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: url('../images/forest-bg.jpg') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Segoe UI', 'Arial', sans-serif;
+      color: #4e3c1e;
+    }
+
+    .container {
+      padding: 40px 20px;
+      text-align: center;
+      background-color: rgba(255, 255, 255, 0.7);
+    }
+
+    textarea {
+      width: 90%;
+      min-height: 60px;
+      font-size: 16pt;
+      padding: 10px;
+      border-radius: 8px;
+      border: 2px solid #bbb;
+      resize: vertical;
+    }
+
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: #8db574;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #729d5d;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      max-width: 600px;
+      margin: 30px auto;
+    }
+
+    .card {
+      background-color: #f5e4c3;
+      border: 3px solid #a67c52;
+      border-radius: 20px;
+      padding: 20px;
+      min-height: 100px;
+      font-size: 26pt;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+    }
+
+    .card.revealed {
+      background-color: #fffbe0;
+      border-color: #eac36e;
+      font-size: 24pt;
+      line-height: 1.2;
+    }
+
+    .animal {
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌳 九宮格抽選</h1>
+    <textarea id="input" placeholder="請輸入9個選項，每個選項以逗號或換行分隔"></textarea>
+    <div>
+      <button onclick="startGrid()">開始</button>
+      <button onclick="resetGrid()">再一次</button>
+      <button onclick="clearGrid()">全部清除</button>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <script>
+    let contentList = [];
+
+    function parseInput() {
+      const raw = document.getElementById('input').value;
+      const items = raw.split(/,|\n/).map(s => s.trim()).filter(s => s);
+      return items.slice(0, 9);
+    }
+
+    function startGrid() {
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+      contentList = shuffle(parseInput());
+
+      for (let i = 0; i < 9; i++) {
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const img = document.createElement('img');
+        img.src = `../images/animal${i + 1}.png`;
+        img.alt = 'animal';
+        img.className = 'animal';
+        card.appendChild(img);
+
+        card.addEventListener('click', function () {
+          if (!card.classList.contains('revealed') && contentList[i]) {
+            card.classList.add('revealed');
+            card.textContent = contentList[i];
+            playSound('ding');
+          }
+        });
+
+        grid.appendChild(card);
+      }
+    }
+
+    function resetGrid() {
+      document.getElementById('grid').innerHTML = '';
+      startGrid();
+    }
+
+    function clearGrid() {
+      document.getElementById('input').value = '';
+      document.getElementById('grid').innerHTML = '';
+    }
+
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function playSound(type) {
+      const audio = new Audio(`../sounds/ding.mp3`);
+      audio.play();
+    }
+  </script>
+</body>
+</html>
