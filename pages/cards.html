@@ -4,23 +4,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>✨ 魔法抽卡</title>
-  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../styles/style.css" />
   <style>
     body {
       margin: 0;
       padding: 0;
-      background: linear-gradient(to bottom, #0b1b2a, #0f2e4f);
-      font-family: 'Segoe UI', 'Noto Sans TC', sans-serif;
-      color: #f5f5f5;
-      overflow-x: hidden;
-      background-image: url('../images/stars-bg.jpg');
+      background: url('../images/starry-sky.jpg') no-repeat center center fixed;
       background-size: cover;
-      background-position: center;
+      font-family: 'Arial', sans-serif;
+      color: #fff;
+      overflow-x: hidden;
     }
 
     .container {
-      text-align: center;
       padding: 40px 20px;
+      text-align: center;
     }
 
     textarea {
@@ -29,10 +27,8 @@
       font-size: 16pt;
       padding: 10px;
       border-radius: 8px;
-      border: 2px solid #999;
+      border: 2px solid #ccc;
       resize: vertical;
-      background-color: rgba(255, 255, 255, 0.1);
-      color: #fff;
     }
 
     .controls {
@@ -43,125 +39,57 @@
       margin: 10px;
       padding: 10px 20px;
       font-size: 18px;
-      background-color: #684bb1;
+      background-color: #8e44ad;
       color: white;
       border: none;
       border-radius: 10px;
       cursor: pointer;
-      box-shadow: 0 0 10px #c0aaff;
     }
 
     button:hover {
-      background-color: #8561c6;
+      background-color: #9b59b6;
     }
 
-    .card-section {
-      display: flex;
-      justify-content: space-around;
-      flex-wrap: wrap;
+    #result {
+      font-size: 45pt;
       margin-top: 30px;
+      color: #f39c12;
     }
 
-    .card {
-      width: 220px;
-      height: 120px;
-      background: linear-gradient(145deg, #eee, #ccc);
-      border-radius: 10px;
-      margin: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 24pt;
-      color: #222;
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-      transition: all 0.6s;
-      cursor: pointer;
-      position: relative;
-    }
-
-    .card.glow {
-      box-shadow: 0 0 30px #fffacd, 0 0 60px #ffd700;
-      background: #fffbe6;
-    }
-
-    .backface {
-      display: none;
-      font-size: 24pt;
-      line-height: 1;
+    .home-link {
+      display: block;
+      margin-top: 30px;
+      font-size: 18px;
+      color: #fff;
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>✨ 魔法抽卡</h1>
-    <p>請輸入兩組牌卡內容（用 , 或換行分隔）：</p>
-    <textarea id="deck1" placeholder="第一組內容"></textarea><br /><br />
-    <textarea id="deck2" placeholder="第二組內容"></textarea>
+    <textarea id="input" placeholder="請輸入選項，每個選項用逗號或換行分隔"></textarea>
     <div class="controls">
-      <button onclick="drawCards()">開始</button>
-      <button onclick="resetCards()">再一次</button>
-      <button onclick="clearInput()">全部清除</button>
+      <button onclick="drawCard()">抽卡</button>
+      <button onclick="clearInput()">清空</button>
     </div>
-    <div class="card-section" id="cardArea"></div>
+    <div id="result"></div>
+    <a href="../index.html" class="home-link">回首頁</a>
   </div>
 
   <script>
-    function parseDeck(textareaId) {
-      const input = document.getElementById(textareaId).value;
-      return input.split(/,|\n/).map(s => s.trim()).filter(s => s);
-    }
-
-    function shuffleArray(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+    function drawCard() {
+      const input = document.getElementById('input').value;
+      const options = input.split(/,|\n/).map(s => s.trim()).filter(s => s);
+      if (options.length > 0) {
+        const randomIndex = Math.floor(Math.random() * options.length);
+        document.getElementById('result').textContent = `🎴 ${options[randomIndex]}`;
       }
-      return array;
-    }
-
-    function drawCards() {
-      const deck1 = shuffleArray(parseDeck('deck1'));
-      const deck2 = shuffleArray(parseDeck('deck2'));
-      const cardArea = document.getElementById('cardArea');
-      cardArea.innerHTML = '';
-
-      const card1 = document.createElement('div');
-      card1.className = 'card';
-      card1.textContent = '?';
-      card1.onclick = () => {
-        card1.textContent = deck1[0] || '（無內容）';
-        card1.classList.add('glow');
-        playSound('ding');
-      };
-
-      const card2 = document.createElement('div');
-      card2.className = 'card';
-      card2.textContent = '?';
-      card2.onclick = () => {
-        card2.textContent = deck2[0] || '（無內容）';
-        card2.classList.add('glow');
-        playSound('ding');
-      };
-
-      cardArea.appendChild(card1);
-      cardArea.appendChild(card2);
-
-      playSound('shuffle');
-    }
-
-    function resetCards() {
-      drawCards();
     }
 
     function clearInput() {
-      document.getElementById('deck1').value = '';
-      document.getElementById('deck2').value = '';
-      document.getElementById('cardArea').innerHTML = '';
-    }
-
-    function playSound(type) {
-      const audio = new Audio(`../sounds/${type}.mp3`);
-      audio.play();
+      document.getElementById('input').value = '';
+      document.getElementById('result').textContent = '';
     }
   </script>
 </body>
