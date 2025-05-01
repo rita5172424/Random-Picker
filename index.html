@@ -3,126 +3,61 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>趣味抽籤網</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>趣味抽籤</title>
   <style>
     body {
       margin: 0;
-      background-color: #fefaf4;
-      font-family: sans-serif;
-      overflow: hidden;
-    }
-
-    .main-menu {
+      padding: 0;
+      font-family: 'Segoe UI', 'Arial', sans-serif;
+      background: linear-gradient(to bottom, #fffaf0, #e0f7fa);
       text-align: center;
-      padding-top: 100px;
+      color: #333;
     }
 
-    .menu-buttons button {
-      margin: 20px;
-      padding: 16px 32px;
-      font-size: 20px;
-      border: none;
-      border-radius: 12px;
-      background-color: #f8c471;
-      color: #fff;
-      cursor: pointer;
-      transition: transform 0.2s;
+    h1 {
+      font-size: 40pt;
+      margin-top: 60px;
     }
 
-    .menu-buttons button:hover {
-      transform: scale(1.05);
-      background-color: #f39c12;
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 300px;
+      margin: 40px auto;
     }
 
-    .cursor-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      z-index: 1000;
+    .nav a {
+      text-decoration: none;
+      font-size: 20pt;
+      padding: 15px 25px;
+      border-radius: 20px;
+      background-color: #a2d5c6;
+      color: #003b36;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transition: background-color 0.3s;
     }
 
-    .hover-circle {
-      position: absolute;
-      width: 1.5cm;
-      height: 1.5cm;
-      border-radius: 50%;
-      background-color: rgba(255, 230, 0, 0.4);
-      transform: translate(-50%, -50%);
-      transition: opacity 0.3s ease;
+    .nav a:hover {
+      background-color: #62c3ab;
     }
 
-    .star {
-      position: absolute;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background-color: rgba(255, 255, 255, 0.6);
-      pointer-events: none;
-      box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
-      animation: floatStar 1s ease-out forwards;
-    }
-
-    @keyframes floatStar {
-      0% { transform: scale(1); opacity: 1; }
-      100% { transform: scale(2); opacity: 0; }
+    footer {
+      margin-top: 60px;
+      font-size: 12pt;
+      color: #777;
     }
   </style>
 </head>
 <body>
-  <div class="cursor-overlay">
-    <div class="hover-circle" id="hoverCircle"></div>
+  <h1>🌟 趣味抽籤</h1>
+  <div class="nav">
+    <a href="pages/wheel.html">🎡 彩色轉盤</a>
+    <a href="pages/cards.html">✨ 魔法抽卡</a>
+    <a href="pages/grid.html">🌲 九宮格抽選</a>
   </div>
-
-  <main class="main-menu">
-    <h1>🎲 趣味隨機抽籤網站</h1>
-    <p>請選擇你想玩的抽籤方式：</p>
-    <div class="menu-buttons">
-      <button onclick="location.href='wheel.html'">🎡 彩色轉盤</button>
-      <button onclick="location.href='cards.html'">🔮 魔幻牌卡</button>
-      <button onclick="location.href='grid.html'">🌳 九宮格布告欄</button>
-    </div>
-  </main>
-
-  <script>
-    const overlay = document.querySelector('.cursor-overlay');
-    const hoverCircle = document.getElementById('hoverCircle');
-    let lastMove = Date.now();
-
-    document.addEventListener('mousemove', e => {
-      hoverCircle.style.left = `${e.pageX}px`;
-      hoverCircle.style.top = `${e.pageY}px`;
-      hoverCircle.style.opacity = '1';
-      lastMove = Date.now();
-      createStars(e.pageX, e.pageY);
-    });
-
-    function createStars(x, y) {
-      for (let i = 0; i < 3; i++) {
-        const star = document.createElement('div');
-        star.classList.add('star');
-        const size = Math.random() * 4 + 4;
-        const colors = ['#b3d9ff', '#fff4b3', '#ffd6e0'];
-        star.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        star.style.width = `${size}px`;
-        star.style.height = `${size}px`;
-        star.style.left = `${x + Math.random()*20 - 10}px`;
-        star.style.top = `${y + Math.random()*20 - 10}px`;
-        overlay.appendChild(star);
-        setTimeout(() => star.remove(), 1000);
-      }
-    }
-
-    setInterval(() => {
-      if (Date.now() - lastMove > 500) {
-        hoverCircle.style.opacity = '1';
-      } else {
-        hoverCircle.style.opacity = '0';
-      }
-    }, 200);
-  </script>
+  <footer>
+    &copy; 2025 趣味抽籤小工具
+  </footer>
 </body>
 </html>
