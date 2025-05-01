@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🌲 九宮格抽選</title>
-  <link rel="stylesheet" href="../styles/style.css" />
   <style>
     body {
       margin: 0;
       padding: 0;
-      background-color: #f1f8e9;
-      font-family: 'Arial', sans-serif;
-      color: #2c3e50;
-      overflow-x: hidden;
+      background-image: url('forest_background.jpg'); /* 請換上森林背景圖片 */
+      background-size: cover;
+      font-family: 'Comic Sans MS', 'Arial', sans-serif;
+      color: #333;
+      cursor: none;
     }
 
     .container {
@@ -20,27 +20,56 @@
       padding: 40px 20px;
     }
 
-    .grid {
+    .controls {
+      margin-top: 20px;
+    }
+
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .grid-container {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
+      grid-gap: 10px;
       margin-top: 30px;
     }
 
     .grid-item {
-      padding: 20px;
-      border: 2px solid #ddd;
-      border-radius: 8px;
-      background-color: #fff;
-      font-size: 18px;
-      font-weight: bold;
+      width: 100px;
+      height: 100px;
+      background-color: rgba(255, 255, 255, 0.8);
+      border-radius: 10px;
+      text-align: center;
+      line-height: 100px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      transition: transform 0.3s ease;
     }
 
     .grid-item:hover {
-      background-color: #f39c12;
-      color: white;
+      transform: scale(1.1);
+    }
+
+    .input-area {
+      margin: 20px 0;
+    }
+
+    .input-area textarea {
+      width: 80%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
     }
 
     .home-link {
@@ -50,31 +79,18 @@
       color: #2c3e50;
       text-decoration: underline;
     }
+
+    .cursor-star {
+      position: fixed;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.1) 70%);
+      box-shadow: 0 0 5px rgba(255,255,255,0.7);
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🌲 九宮格抽選</h1>
-    <div class="grid">
-      <div class="grid-item" onclick="selectCell(this)">1</div>
-      <div class="grid-item" onclick="selectCell(this)">2</div>
-      <div class="grid-item" onclick="selectCell(this)">3</div>
-      <div class="grid-item" onclick="selectCell(this)">4</div>
-      <div class="grid-item" onclick="selectCell(this)">5</div>
-      <div class="grid-item" onclick="selectCell(this)">6</div>
-      <div class="grid-item" onclick="selectCell(this)">7</div>
-      <div class="grid-item" onclick="selectCell(this)">8</div>
-      <div class="grid-item" onclick="selectCell(this)">9</div>
-    </div>
-    <a href="../index.html" class="home-link">回首頁</a>
-  </div>
-
-  <script>
-    function selectCell(cell) {
-      cell.style.backgroundColor = "#2ecc71";
-      cell.style.color = "#fff";
-      cell.textContent = '選擇完成';
-    }
-  </script>
-</body>
-</html>
+  <div class="
