@@ -1,96 +1,183 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>✨ 魔法抽卡</title>
-  <link rel="stylesheet" href="../styles/style.css" />
   <style>
     body {
       margin: 0;
       padding: 0;
-      background: url('../images/starry-sky.jpg') no-repeat center center fixed;
+      background-image: url('your_background_image.jpg'); /* 請換上背景圖片 */
       background-size: cover;
-      font-family: 'Arial', sans-serif;
-      color: #fff;
-      overflow-x: hidden;
+      background-position: center;
+      font-family: 'Comic Sans MS', 'Arial', sans-serif;
+      color: #333;
+      cursor: none;
     }
-
+    
     .container {
-      padding: 40px 20px;
       text-align: center;
+      padding: 40px 20px;
     }
-
-    textarea {
-      width: 90%;
-      min-height: 80px;
-      font-size: 16pt;
-      padding: 10px;
-      border-radius: 8px;
-      border: 2px solid #ccc;
-      resize: vertical;
-    }
-
+    
     .controls {
       margin-top: 20px;
     }
-
+    
     button {
       margin: 10px;
       padding: 10px 20px;
       font-size: 18px;
-      background-color: #8e44ad;
+      background-color: #f39c12;
       color: white;
       border: none;
       border-radius: 10px;
       cursor: pointer;
     }
-
+    
     button:hover {
-      background-color: #9b59b6;
+      background-color: #e67e22;
     }
 
-    #result {
-      font-size: 45pt;
-      margin-top: 30px;
-      color: #f39c12;
+    .card {
+      width: 120px;
+      height: 180px;
+      border-radius: 12px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+      margin: 10px;
+      background-color: white;
+      display: inline-block;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card img {
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
+    }
+
+    .card-content {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      color: white;
+      text-align: center;
+      padding: 10px;
+      border-radius: 0 0 12px 12px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.1);
+      box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .card:hover .card-content {
+      opacity: 1;
     }
 
     .home-link {
       display: block;
       margin-top: 30px;
       font-size: 18px;
-      color: #fff;
+      color: #2c3e50;
       text-decoration: underline;
+    }
+    
+    .cursor-star {
+      position: fixed;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.1) 70%);
+      box-shadow: 0 0 5px rgba(255,255,255,0.7);
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>✨ 魔法抽卡</h1>
-    <textarea id="input" placeholder="請輸入選項，每個選項用逗號或換行分隔"></textarea>
     <div class="controls">
-      <button onclick="drawCard()">抽卡</button>
-      <button onclick="clearInput()">清空</button>
+      <button onclick="shuffleCards()">洗牌</button>
+      <button onclick="clearCards()">清除</button>
+      <button onclick="resetCards()">重置</button>
     </div>
-    <div id="result"></div>
-    <a href="../index.html" class="home-link">回首頁</a>
+    <div id="cards-container" class="cards-container">
+      <!-- 卡片將動態生成在這裡 -->
+    </div>
+    <a href="index.html" class="home-link">回首頁</a>
   </div>
 
+  <div class="cursor-star" id="cursor"></div>
+
   <script>
-    function drawCard() {
-      const input = document.getElementById('input').value;
-      const options = input.split(/,|\n/).map(s => s.trim()).filter(s => s);
-      if (options.length > 0) {
-        const randomIndex = Math.floor(Math.random() * options.length);
-        document.getElementById('result').textContent = `🎴 ${options[randomIndex]}`;
-      }
+    const cursor = document.getElementById('cursor');
+    const cardsContainer = document.getElementById('cards-container');
+    let cardData = [
+      { text: '卡片 1', image: 'card1.jpg' },
+      { text: '卡片 2', image: 'card2.jpg' },
+      { text: '卡片 3', image: 'card3.jpg' },
+      { text: '卡片 4', image: 'card4.jpg' }
+    ];
+    let cardElements = [];
+
+    // 初始化卡片顯示
+    function renderCards() {
+      cardsContainer.innerHTML = '';
+      cardData.forEach((card, index) => {
+        const cardElement = document.createElement('div');
+        cardElement.classList.add('card');
+        cardElement.innerHTML = `
+          <img src="${card.image}" alt="${card.text}">
+          <div class="card-content">${card.text}</div>
+        `;
+        cardElement.addEventListener('click', () => {
+          alert(`抽到：${card.text}`);
+          cardData = cardData.filter((_, i) => i !== index);
+          renderCards();
+        });
+        cardsContainer.appendChild(cardElement);
+        cardElements.push(cardElement);
+      });
     }
 
-    function clearInput() {
-      document.getElementById('input').value = '';
-      document.getElementById('result').textContent = '';
+    // 洗牌動畫
+    function shuffleCards() {
+      let shuffled = cardData.sort(() => Math.random() - 0.5);
+      cardData = shuffled;
+      renderCards();
     }
+
+    // 清除卡片
+    function clearCards() {
+      cardData = [];
+      renderCards();
+    }
+
+    // 重置卡片
+    function resetCards() {
+      cardData = [
+        { text: '卡片 1', image: 'card1.jpg' },
+        { text: '卡片 2', image: 'card2.jpg' },
+        { text: '卡片 3', image: 'card3.jpg' },
+        { text: '卡片 4', image: 'card4.jpg' }
+      ];
+      renderCards();
+    }
+
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.left = `${e.clientX - 10}px`;
+      cursor.style.top = `${e.clientY - 10}px`;
+    });
+
+    renderCards();
   </script>
 </body>
 </html>
