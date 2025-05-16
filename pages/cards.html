@@ -8,77 +8,80 @@
     body {
       margin: 0;
       padding: 0;
-      background-image: url('../assets/image/cardback.jpeg'); 
+      background-image: url('assets/image/stars-bg.jpg');
       background-size: cover;
       background-position: center;
       font-family: 'Comic Sans MS', 'Arial', sans-serif;
       color: #333;
       cursor: none;
     }
-    
+
     .container {
       text-align: center;
       padding: 40px 20px;
     }
-    
-    .controls {
-      margin-top: 20px;
+
+    textarea {
+      width: 80%;
+      height: 80px;
+      font-size: 16pt;
+      margin-bottom: 20px;
+      padding: 10px;
+      border-radius: 8px;
+      resize: both;
     }
-    
-    button {
+
+    .controls button {
       margin: 10px;
       padding: 10px 20px;
       font-size: 18px;
-      background-color: #f39c12;
+      background-color: #8e44ad;
       color: white;
       border: none;
       border-radius: 10px;
       cursor: pointer;
     }
-    
-    button:hover {
-      background-color: #e67e22;
+
+    .controls button:hover {
+      background-color: #6c3483;
+    }
+
+    .cards-container {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 30px;
     }
 
     .card {
-      width: 120px;
-      height: 180px;
-      border-radius: 12px;
-      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+      width: 180px;
+      height: 120px;
+      border-radius: 10px;
+      background-color: #fff8f0;
       margin: 10px;
-      background-color: white;
-      display: inline-block;
       position: relative;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+      overflow: hidden;
       cursor: pointer;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      transition: transform 0.5s ease;
     }
 
     .card img {
       width: 100%;
       height: 100%;
-      border-radius: 12px;
+      object-fit: cover;
     }
 
-    .card-content {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      color: white;
-      text-align: center;
+    .card.revealed {
+      background-color: #fdf6e3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24pt;
+      color: #2c3e50;
       padding: 10px;
-      border-radius: 0 0 12px 12px;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .card:hover {
-      transform: scale(1.1);
-      box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
-    }
-
-    .card:hover .card-content {
-      opacity: 1;
+      line-height: 1.2;
+      text-align: center;
     }
 
     .home-link {
@@ -88,7 +91,7 @@
       color: #2c3e50;
       text-decoration: underline;
     }
-    
+
     .cursor-star {
       position: fixed;
       width: 20px;
@@ -104,81 +107,95 @@
 <body>
   <div class="container">
     <h1>✨ 魔法抽卡</h1>
-    <div class="controls">
-      <button onclick="shuffleCards()">洗牌</button>
-      <button onclick="clearCards()">清除</button>
-      <button onclick="resetCards()">重置</button>
-    </div>
-    <div id="cards-container" class="cards-container">
-      <!-- 卡片將動態生成在這裡 -->
-    </div>
-    <a href="../index.html" class="home-link">回首頁</a>
+    
+    <textarea id="group1" placeholder="請輸入第一組卡片內容，使用 , 或換行分隔"></textarea><br>
+    <textarea id="group2" placeholder="請輸入第二組卡片內容，使用 , 或換行分隔"></textarea>
 
+    <div class="controls">
+      <button onclick="startDraw()">開始</button>
+      <button onclick="shuffleAgain()">再一次</button>
+      <button onclick="clearAll()">全部清除</button>
+    </div>
+
+    <div id="cards-container" class="cards-container"></div>
+
+    <a href="/index.html" class="home-link">回首頁</a>
   </div>
 
   <div class="cursor-star" id="cursor"></div>
 
   <script>
     const cursor = document.getElementById('cursor');
-    const cardsContainer = document.getElementById('cards-container');
-    let cardData = [
-      { text: '卡片 1', image: 'card1.jpg' },
-      { text: '卡片 2', image: 'card2.jpg' },
-      { text: '卡片 3', image: 'card3.jpg' },
-      { text: '卡片 4', image: 'card4.jpg' }
-    ];
-    let cardElements = [];
-
-    // 初始化卡片顯示
-    function renderCards() {
-      cardsContainer.innerHTML = '';
-      cardData.forEach((card, index) => {
-        const cardElement = document.createElement('div');
-        cardElement.classList.add('card');
-        cardElement.innerHTML = `
-          <img src="${card.image}" alt="${card.text}">
-          <div class="card-content">${card.text}</div>
-        `;
-        cardElement.addEventListener('click', () => {
-          alert(`抽到：${card.text}`);
-          cardData = cardData.filter((_, i) => i !== index);
-          renderCards();
-        });
-        cardsContainer.appendChild(cardElement);
-        cardElements.push(cardElement);
-      });
-    }
-
-    // 洗牌動畫
-    function shuffleCards() {
-      let shuffled = cardData.sort(() => Math.random() - 0.5);
-      cardData = shuffled;
-      renderCards();
-    }
-
-    // 清除卡片
-    function clearCards() {
-      cardData = [];
-      renderCards();
-    }
-
-    // 重置卡片
-    function resetCards() {
-      cardData = [
-        { text: '卡片 1', image: 'card1.jpg' },
-        { text: '卡片 2', image: 'card2.jpg' },
-        { text: '卡片 3', image: 'card3.jpg' },
-        { text: '卡片 4', image: 'card4.jpg' }
-      ];
-      renderCards();
-    }
-
     document.addEventListener('mousemove', (e) => {
       cursor.style.left = `${e.clientX - 10}px`;
       cursor.style.top = `${e.clientY - 10}px`;
     });
 
-    renderCards();
+    const container = document.getElementById('cards-container');
+    let group1 = [], group2 = [];
+
+    function getInputs() {
+      group1 = document.getElementById('group1').value.split(/,|\n/).map(s => s.trim()).filter(s => s);
+      group2 = document.getElementById('group2').value.split(/,|\n/).map(s => s.trim()).filter(s => s);
+    }
+
+    function showCards(back = true) {
+      container.innerHTML = '';
+      const allCards = [group1, group2];
+      allCards.forEach((group, groupIndex) => {
+        group.forEach(text => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          if (back) {
+            const img = document.createElement('img');
+            img.src = 'assets/image/cardback.jpeg';
+            card.appendChild(img);
+          } else {
+            card.classList.add('revealed');
+            card.textContent = text;
+          }
+          container.appendChild(card);
+        });
+      });
+    }
+
+    function startDraw() {
+      getInputs();
+      if (group1.length === 0 || group2.length === 0) {
+        alert('請輸入兩組卡片內容');
+        return;
+      }
+
+      group1 = shuffleArray(group1);
+      group2 = shuffleArray(group2);
+      showCards(true); // 顯示背面
+
+      setTimeout(() => {
+        showCards(false); // 顯示正面
+      }, 5000); // 模擬洗牌動畫5秒
+    }
+
+    function shuffleAgain() {
+      if (group1.length === 0 || group2.length === 0) return;
+      group1 = shuffleArray(group1);
+      group2 = shuffleArray(group2);
+      showCards(true);
+      setTimeout(() => {
+        showCards(false);
+      }, 5000);
+    }
+
+    function clearAll() {
+      document.getElementById('group1').value = '';
+      document.getElementById('group2').value = '';
+      group1 = [];
+      group2 = [];
+      container.innerHTML = '';
+    }
+
+    function shuffleArray(arr) {
+      return [...arr].sort(() => Math.random() - 0.5);
+    }
   </script>
 </body>
 </html>
