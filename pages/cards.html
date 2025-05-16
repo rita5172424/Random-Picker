@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>✨ 魔法抽卡</title>
   <style>
     body {
       margin: 0;
       padding: 0;
-      background-image: url('assets/image/stars-bg.jpg');
+      background-image: url('../assets/image/stars-bg.jpg');
       background-size: cover;
       background-position: center;
       font-family: 'Comic Sans MS', 'Arial', sans-serif;
@@ -57,13 +57,15 @@
       width: 180px;
       height: 120px;
       border-radius: 10px;
-      background-color: #fff8f0;
       margin: 10px;
       position: relative;
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.7);
       overflow: hidden;
       cursor: pointer;
       transition: transform 0.5s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .card img {
@@ -74,14 +76,12 @@
 
     .card.revealed {
       background-color: #fdf6e3;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       font-size: 24pt;
       color: #2c3e50;
       padding: 10px;
-      line-height: 1.2;
+      line-height: 1;
       text-align: center;
+      box-shadow: 0 0 25px 5px rgba(255, 255, 255, 0.8);
     }
 
     .home-link {
@@ -119,7 +119,7 @@
 
     <div id="cards-container" class="cards-container"></div>
 
-    <a href="/index.html" class="home-link">回首頁</a>
+    <a href="../index.html" class="home-link">回首頁</a>
   </div>
 
   <div class="cursor-star" id="cursor"></div>
@@ -139,24 +139,20 @@
       group2 = document.getElementById('group2').value.split(/,|\n/).map(s => s.trim()).filter(s => s);
     }
 
-    function showCards(back = true) {
-      container.innerHTML = '';
-      const allCards = [group1, group2];
-      allCards.forEach((group, groupIndex) => {
-        group.forEach(text => {
-          const card = document.createElement('div');
-          card.className = 'card';
-          if (back) {
-            const img = document.createElement('img');
-            img.src = 'assets/image/cardback.jpeg';
-            card.appendChild(img);
-          } else {
-            card.classList.add('revealed');
-            card.textContent = text;
-          }
-          container.appendChild(card);
-        });
-      });
+    function showCard(text) {
+      const card = document.createElement('div');
+      card.className = 'card revealed';
+      card.textContent = text;
+      container.appendChild(card);
+    }
+
+    function showCardBack() {
+      const card = document.createElement('div');
+      card.className = 'card';
+      const img = document.createElement('img');
+      img.src = '../assets/image/cardback.jpeg';
+      card.appendChild(img);
+      container.appendChild(card);
     }
 
     function startDraw() {
@@ -166,22 +162,31 @@
         return;
       }
 
-      group1 = shuffleArray(group1);
-      group2 = shuffleArray(group2);
-      showCards(true); // 顯示背面
+      // 顯示背面（洗牌動畫）
+      container.innerHTML = '';
+      showCardBack();
+      showCardBack();
 
       setTimeout(() => {
-        showCards(false); // 顯示正面
-      }, 5000); // 模擬洗牌動畫5秒
+        container.innerHTML = '';
+        const random1 = shuffleArray(group1)[0];
+        const random2 = shuffleArray(group2)[0];
+        showCard(random1);
+        showCard(random2);
+      }, 5000);
     }
 
     function shuffleAgain() {
       if (group1.length === 0 || group2.length === 0) return;
-      group1 = shuffleArray(group1);
-      group2 = shuffleArray(group2);
-      showCards(true);
+      container.innerHTML = '';
+      showCardBack();
+      showCardBack();
       setTimeout(() => {
-        showCards(false);
+        container.innerHTML = '';
+        const random1 = shuffleArray(group1)[0];
+        const random2 = shuffleArray(group2)[0];
+        showCard(random1);
+        showCard(random2);
       }, 5000);
     }
 
