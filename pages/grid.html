@@ -8,10 +8,11 @@
     body {
       margin: 0;
       padding: 0;
-      background-image: url('forest_background.jpg'); /* 請換上森林背景圖片 */
+      background-image: url('assets/image/forest-bg.jpg');
       background-size: cover;
-      font-family: 'Comic Sans MS', 'Arial', sans-serif;
-      color: #333;
+      background-position: center;
+      font-family: 'Arial', sans-serif;
+      color: #5D4037; /* 深褐色 */
       cursor: none;
     }
 
@@ -20,56 +21,69 @@
       padding: 40px 20px;
     }
 
-    .controls {
-      margin-top: 20px;
+    .input-area {
+      margin-bottom: 20px;
     }
 
-    button {
+    .input-area textarea {
+      width: 80%;
+      height: 80px;
+      padding: 10px;
+      font-size: 16pt;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      resize: both;
+    }
+
+    .controls button {
       margin: 10px;
       padding: 10px 20px;
       font-size: 18px;
-      background-color: #4CAF50;
+      background-color: #8D6E63;
       color: white;
       border: none;
       border-radius: 10px;
       cursor: pointer;
     }
 
-    button:hover {
-      background-color: #45a049;
+    .controls button:hover {
+      background-color: #6D4C41;
     }
 
     .grid-container {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      grid-gap: 10px;
+      grid-gap: 15px;
+      justify-items: center;
       margin-top: 30px;
     }
 
     .grid-item {
-      width: 100px;
-      height: 100px;
-      background-color: rgba(255, 255, 255, 0.8);
-      border-radius: 10px;
-      text-align: center;
-      line-height: 100px;
+      width: 160px;
+      height: 160px;
+      background-color: #D7CCC8; /* 淺褐色 */
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-size: 26pt;
+      line-height: 1.2;
       cursor: pointer;
-      transition: transform 0.3s ease;
+      position: relative;
+      overflow: hidden;
     }
 
-    .grid-item:hover {
-      transform: scale(1.1);
+    .grid-item img {
+      width: 80px;
+      height: 80px;
     }
 
-    .input-area {
-      margin: 20px 0;
-    }
-
-    .input-area textarea {
-      width: 80%;
+    .grid-item .text {
+      display: none;
       padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+      color: #5D4037;
     }
 
     .home-link {
@@ -93,4 +107,88 @@
   </style>
 </head>
 <body>
-  <div class="
+  <div class="container">
+    <h1>🌲 九宮格抽選</h1>
+
+    <div class="input-area">
+      <textarea id="input" placeholder="請輸入 9 個選項，以逗號或換行分隔">項目一, 項目二, 項目三, 項目四, 項目五, 項目六, 項目七, 項目八, 項目九</textarea>
+    </div>
+
+    <div class="controls">
+      <button onclick="startDraw()">開始</button>
+      <button onclick="shuffleAgain()">再一次</button>
+      <button onclick="clearAll()">全部清除</button>
+    </div>
+
+    <div class="grid-container" id="grid"></div>
+    <a href="index.html" class="home-link">回首頁</a>
+  </div>
+
+  <div class="cursor-star" id="cursor"></div>
+
+  <script>
+    const cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.left = `${e.clientX - 10}px`;
+      cursor.style.top = `${e.clientY - 10}px`;
+    });
+
+    let options = [];
+    const grid = document.getElementById('grid');
+
+    function getUserInput() {
+      const input = document.getElementById('input').value;
+      const raw = input.split(/,|\n/);
+      return raw.map(x => x.trim()).filter(x => x);
+    }
+
+    function createGrid(items) {
+      grid.innerHTML = '';
+      for (let i = 0; i < 9; i++) {
+        const div = document.createElement('div');
+        div.className = 'grid-item';
+
+        const img = document.createElement('img');
+        img.src = `assets/image/animal${i + 1}.png`;
+        img.alt = `動物${i + 1}`;
+
+        const text = document.createElement('div');
+        text.className = 'text';
+        text.textContent = items[i];
+
+        div.appendChild(img);
+        div.appendChild(text);
+
+        div.addEventListener('click', () => {
+          img.style.display = 'none';
+          text.style.display = 'block';
+        });
+
+        grid.appendChild(div);
+      }
+    }
+
+    function startDraw() {
+      options = getUserInput();
+      if (options.length !== 9) {
+        alert('請輸入正好 9 個選項');
+        return;
+      }
+      const shuffled = [...options].sort(() => Math.random() - 0.5);
+      createGrid(shuffled);
+    }
+
+    function shuffleAgain() {
+      if (options.length !== 9) return;
+      const shuffled = [...options].sort(() => Math.random() - 0.5);
+      createGrid(shuffled);
+    }
+
+    function clearAll() {
+      document.getElementById('input').value = '';
+      grid.innerHTML = '';
+      options = [];
+    }
+  </script>
+</body>
+</html>
